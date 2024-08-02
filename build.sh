@@ -27,6 +27,30 @@ fi
 # 进入Docker目录
 cd "$DOCKER_DIR"
 
+# 找到并停止运行中的容器
+CONTAINER_ID=$(docker ps -q --filter ancestor="$DOCKER_IMAGE_NAME")
+if [ -n "$CONTAINER_ID" ]; then
+  echo "找到运行中的容器，ID: $CONTAINER_ID。正在停止容器..."
+  docker stop "$CONTAINER_ID"
+  
+  # 检查停止容器是否成功
+  if [ $? -ne 0 ]; then
+    echo "停止容器失败，脚本终止。"
+    exit 1
+  fi
+
+  echo "正在删除容器..."
+  docker rm "$CONTAINER_ID"
+  
+  # 检查删除容器是否成功
+  if [ $? -ne 0 ]; then
+    echo "删除容器失败，脚本终止。"
+    exit 1
+  fi
+else
+  echo "未找到运行中的容器。"
+fi
+
 # 找到Docker镜像的imageId
 IMAGE_ID=$(docker images -q "$DOCKER_IMAGE_NAME")
 
