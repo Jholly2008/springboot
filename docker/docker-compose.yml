@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  springboot-demo:
+    image: kkk2099/kkk:springboot-demo-1.0
+    environment:
+      - JVM_MEM=2G
+    volumes:
+      - ./logs:/data/apps/logs
+    ports:
+      - "10001:10001/tcp"
+    networks:
+      demo:
+
+networks:
+  demo:
+    driver: host
