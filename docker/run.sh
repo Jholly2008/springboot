@@ -5,6 +5,9 @@ echo JVM_MEM:$JVM_MEM
 
 if test -z "$PINPOINT_APPNAME"; then
     case "$JVM_MEM" in
+        "1G")
+            java -Xms800m -Xmx800m -Xmn256m -Xss512k -XX:SurvivorRatio=8 -XX:MaxDirectMemorySize=128m -XX:MetaspaceSize=100M -XX:MaxMetaspaceSize=100m -XX:+UnlockExperimentalVMOptions -XX:ConcGCThreads=1 -XX:ParallelGCThreads=1 -XX:+UseG1GC -XX:MaxGCPauseMillis=50 -XX:ReservedCodeCacheSize=64m -XX:+UseCompressedClassPointers -XX:CompressedClassSpaceSize=48M -XX:-UseCounterDecay -XX:+AlwaysPreTouch -XX:+DisableExplicitGC -XX:+UnlockDiagnosticVMOptions -XX:GuaranteedSafepointInterval=0 -XX:+UseCountedLoopSafepoints -XX:LoopStripMiningIter=1000 -XX:+PrintCommandLineFlags -XX:+ExplicitGCInvokesConcurrent -XX:AutoBoxCacheMax=20000 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/usr/local/apps/jvm/ -XX:ErrorFile=/usr/local/apps/jvm/hs_err_%p.log -jar app.jar
+            ;;
         "2G")
             java -Xms1638m -Xmx1638m -Xmn512m -Xss512k -XX:SurvivorRatio=8 -XX:MaxDirectMemorySize=256m -XX:MetaspaceSize=200M -XX:MaxMetaspaceSize=200m -XX:+UnlockExperimentalVMOptions -XX:ConcGCThreads=1 -XX:ParallelGCThreads=2 -XX:+UseG1GC -XX:MaxGCPauseMillis=50 -XX:ReservedCodeCacheSize=128m -XX:+UseCompressedClassPointers -XX:CompressedClassSpaceSize=48M -XX:-UseCounterDecay -XX:+AlwaysPreTouch -XX:+DisableExplicitGC -XX:+UnlockDiagnosticVMOptions -XX:GuaranteedSafepointInterval=0 -XX:+UseCountedLoopSafepoints -XX:LoopStripMiningIter=1000 -XX:+PrintCommandLineFlags -XX:+ExplicitGCInvokesConcurrent -XX:AutoBoxCacheMax=20000 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/usr/local/apps/jvm/ -XX:ErrorFile=/usr/local/apps/jvm/hs_err_%p.log -jar app.jar
             ;;
@@ -15,7 +18,7 @@ if test -z "$PINPOINT_APPNAME"; then
             java -Xms6144m -Xmx6144m -Xmn2048m -Xss512k -XX:SurvivorRatio=8 -XX:MaxDirectMemorySize=512m -XX:MetaspaceSize=400M -XX:MaxMetaspaceSize=400m -XX:+UnlockExperimentalVMOptions -XX:ConcGCThreads=2 -XX:ParallelGCThreads=4 -XX:+UseG1GC -XX:MaxGCPauseMillis=50 -XX:ReservedCodeCacheSize=256m -XX:+UseCompressedClassPointers -XX:CompressedClassSpaceSize=48M -XX:-UseCounterDecay -XX:+AlwaysPreTouch -XX:+DisableExplicitGC -XX:+UnlockDiagnosticVMOptions -XX:GuaranteedSafepointInterval=0 -XX:+UseCountedLoopSafepoints -XX:LoopStripMiningIter=1000 -XX:+PrintCommandLineFlags -XX:+ExplicitGCInvokesConcurrent -XX:AutoBoxCacheMax=20000 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/usr/local/apps/jvm/ -XX:ErrorFile=/usr/local/apps/jvm/hs_err_%p.log -jar app.jar
             ;;
         *)
-            echo "Invalid JVM_MEM value. Please set it to '2G', '4G', or '8G'."
+            echo "Invalid JVM_MEM value. Please set it to '1G', '2G', '4G', or '8G'."
             exit 1
             ;;
     esac
