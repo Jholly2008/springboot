@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Configuration后面的status，这个用于设置log4j2自身内部的信息输出，可以不设置，当设置成trace时，你会看到log4j2内部各种详细输出-->
+<!--monitorInterval：Log4j能够自动检测修改配置 文件和重新配置本身，设置间隔秒数-->
+<!-- 每隔30秒，log4j2会刷新一次配置。 -->
+<configuration monitorInterval="30">
+    <!--日志级别以及优先级排序: OFF > FATAL > ERROR > WARN > INFO > DEBUG > TRACE > ALL -->
+
+    <!--变量配置-->
+    <Properties>
+        <!-- 格式化输出：%date表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度 %msg：日志消息，%n是换行符-->
+        <!-- %logger{36} 表示 Logger 名字最长36个字符 -->
+        <property name="LOG_PATTERN" value="%date{HH:mm:ss.SSS} [TxId : %X{PtxId} , SpanId : %X{PspanId}] [%thread] %-5level %logger{36} - %msg %n" />
+        <!-- 定义日志存储的路径 --><!-- 取spring的变量的写法如下 -->
+        <property name="FILE_PATH">${spring:logging.file.path}</property>
+        <property name="FILE_NAME">${spring:logging.file.name}</property>
+        <property name="LOG_LEVEL">${spring:logging.pattern.level}</property>
+    </Properties>
+
+    <appenders>
+
+        <console name="Console" target="SYSTEM_OUT">
+            <!--输出日志的格式-->
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+        </console>
+
+        <!-- 这个会打印出所有的info及以上级别的信息，每次大小超过size，则这size大小的日志会自动存入按年份-月份建立的文件夹下面并进行压缩，作为存档-->
+        <RollingFile name="RollingFile" fileName="${FILE_PATH}/${FILE_NAME}.log" filePattern="${FILE_PATH}/${FILE_NAME}-%d{yyyy-MM-dd}_%i.log.gz" append="true">
+            <PatternLayout pattern="${LOG_PATTERN}" charset="UTF-8"/>
+            <!-- ThresholdFilter：只输出level及以上级别的信息（onMatch），其他的直接拒绝（onMismatch）,如果没有配置ThresholdFilter则使用loggers定义的level -->
+            <!--<ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>-->
+            <Policies>
+                <!-- 基于时间的触发策略。该策略主要是完成周期性的log文件封存工作。有两个参数：
+               interval，integer型，指定两次封存动作之间的时间间隔。单位:以日志的命名精度来确定单位，
+                   比如yyyy-MM-dd-HH 单位为小时，yyyy-MM-dd-HH-mm 单位为分钟
+               modulate，boolean型，说明是否对封存时间进行调制。若modulate=true，
+                   则封存时间将以0点为边界进行偏移计算。比如，modulate=true，interval=4hours，
+                   那么假设上次封存日志的时间为00:00，则下次封存日志的时间为04:00，
+                   之后的封存时间依次为08:00，12:00，16:00-->
+                <TimeBasedTriggeringPolicy interval="1"/>
+                <SizeBasedTriggeringPolicy size="10MB"/>
+            </Policies>
+            <!-- DefaultRolloverStrategy 属性如不设置，则默认为最多同一文件夹下当天 7 个文件后开始覆盖-->
+            <DefaultRolloverStrategy max="30">
+                <!-- 删除处理策略，在配置的路径中搜索，maxDepth 表示往下搜索的最大深度 -->
+                <Delete basePath="${FILE_PATH}/" maxDepth="2">
+                    <!-- 文件名搜索匹配，支持正则 -->
+                    <IfFileName glob="*.log.gz" />
+                    <!--!Note: 这里的 age 必须和 filePattern 协调, 后者是精确到 dd, 这里就要写成 xd, xD 就不起作用
+                    另外, 数字最好 >2, 否则可能造成删除的时候, 最近的文件还处于被占用状态,导致删除不成功!-->
+                    <!--7天-->
+                    <IfLastModified age="7d" />
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+
+    </appenders>
+
+
+    <!--定义loggers，只有定义了logger并引入的appender，appender才会生效-->
+    <loggers>
+        <!--Logger节点用来单独指定日志的形式，比如要为指定包下的class指定不同的日志级别等。-->
+        <!--若是additivity设为false，则 子Logger 只会在自己的appender里输出，而不会在 父Logger（顶级父就是root(它负责处理系统中所有未明确配置的日志事件)） 的appender里输出。-->
+<!--        <Logger name="org.springframework" level="${LOG_LEVEL}" additivity="false">-->
+<!--            <AppenderRef ref="Console"/>-->
+<!--        </Logger>-->
+        <root level="${LOG_LEVEL}" includeLocation="true">
+            <!-- level 定义日志级别,大于等于level级别的日志都将被输出&ndash -->
+            <!--Console、RollingFileInfo 没有配置 ThresholdFilter，默认走的是 AsyncRoot 的 level 级别 -->
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="RollingFile" />
+        </root>
+    </loggers>
+</configuration>
