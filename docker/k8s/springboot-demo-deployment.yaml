@@ -58,4 +58,29 @@ spec:
       port: 10001  # 你希望暴露的端口
       targetPort: 10001  # 容器内部端口
       nodePort: 31001  # 固定的 NodePort
-  type: NodePort  # 或者根据需要设置为 NodePort 或 LoadBalancer
+  type: ClusterIP  # 或者根据需要设置为 NodePort 或 LoadBalancer
+
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: springboot-demo-ingress
+  namespace: default
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+    - host: k8s.konglingan.com
+      http:
+        paths:
+          - path: /app1
+            pathType: Prefix
+            backend:
+              service:
+                name: springboot-demo
+                port:
+                  number: 10001
+
+
+
