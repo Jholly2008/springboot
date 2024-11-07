@@ -65,15 +65,16 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: springboot-demo-ingress
-  namespace: default  # 与 springboot-demo 应用和服务在同一命名空间
+  namespace: default
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/rewrite-target: /$2  # 确保路径被正确重写
 spec:
+  ingressClassName: nginx  # 指定你的 IngressClass
   rules:
-    - host: k8s.konglingan.com  # 你的应用访问域名
+    - host: k8s.konglingan.com
       http:
         paths:
-          - path: /
+          - path: /app1(/|$)(.*)  # 使用正则匹配路径 /app1 及其子路径
             pathType: Prefix
             backend:
               service:
