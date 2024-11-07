@@ -67,20 +67,21 @@ metadata:
   name: springboot-demo-ingress
   namespace: default
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /$2  # 保证路径重写生效
+    nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
-  ingressClassName: nginx
+  ingressClassName: nginx  # 添加这一行
   rules:
     - host: k8s.konglingan.com
       http:
         paths:
-          - path: /app1
+          - path: /
             pathType: Prefix
             backend:
               service:
                 name: springboot-demo
                 port:
                   number: 10001
+
 
 
 
