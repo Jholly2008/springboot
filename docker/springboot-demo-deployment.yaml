@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: springboot-demo
+spec:
+  replicas: 1  # 可以根据需要调整副本数
+  selector:
+    matchLabels:
+      app: springboot-demo
+  template:
+    metadata:
+      labels:
+        app: springboot-demo
+    spec:
+      containers:
+        - name: springboot-demo
+          image: kkk2099/kkk:springboot3-1.0
+          env:
+            - name: JVM_MEM
+              value: "1G"
+          volumeMounts:
+            - name: logs
+              mountPath: /data/apps/logs  # 挂载本地日志目录到容器内
+          ports:
+            - containerPort: 10001  # 健康检查的端口
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 10001
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 10001
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+      volumes:
+        - name: logs
+          hostPath:
+            path: /data/logs/demo  # 替换为你本地机器上挂载的路径
+            type: DirectoryOrCreate  # 你可以根据实际情况选择其他类型，例如：DirectoryOrCreate
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: springboot-demo
+spec:
+  selector:
+    app: springboot-demo
+  ports:
+    - protocol: TCP
+      port: 80  # 你希望暴露的端口
+      targetPort: 10001  # 容器内部端口
+  type: ClusterIP  # 或者根据需要设置为 NodePort 或 LoadBalancer
