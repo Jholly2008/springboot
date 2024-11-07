@@ -70,7 +70,7 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
-    - host: k8s.konglingan.com:32266
+    - host: k8s.konglingan.com
       http:
         paths:
           - path: /app1
