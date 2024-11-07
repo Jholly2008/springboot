@@ -1,6 +1,7 @@
 package com.springboot.demo.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -8,6 +9,10 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("springboot-demo/hello")
 @Slf4j
 public class HelloController {
+
+    @Value("${app.version}")
+    private String version;
+
     @GetMapping("/test-log")
     public String testLog() {
         // 写日志
@@ -16,6 +21,13 @@ public class HelloController {
         log.info("Write info log...");
         log.error("Write error log...");
         return "Log write ...";
+    }
+
+    @GetMapping("/version")
+    public String version() {
+        log.error("version..." + version);
+        System.out.println("version..." + version);
+        return "version ..." + version;
     }
 
     @GetMapping("/test-io")
