@@ -17,6 +17,7 @@ spec:
       containers:
         - name: springboot-demo
           image: kkk2099/kkk:springboot-demo-1.0
+          imagePullPolicy: Always
           env:
             - name: JVM_MEM
               value: "1G"
@@ -61,6 +62,7 @@ spec:
       containers:
         - name: springboot-demo
           image: kkk2099/kkk:springboot-demo-1.0
+          imagePullPolicy: Always
           env:
             - name: JVM_MEM
               value: "1G"
