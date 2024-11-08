@@ -15,11 +15,11 @@ spec:
       route:
         - destination:
             host: springboot-demo
-            subset: v1.0.0
+            subset: v1-0-0
     - route:
         - destination:
             host: springboot-demo
-            subset: v2.0.0
+            subset: v2-0-0
 
 ---
 apiVersion: networking.istio.io/v1alpha3
@@ -29,9 +29,9 @@ metadata:
 spec:
   host: springboot-demo
   subsets:
-    - name: v1.0.0
+    - name: v1-0-0
       labels:
         version: v1.0.0
-    - name: v2.0.0
+    - name: v2-0-0
       labels:
         version: v2.0.0
