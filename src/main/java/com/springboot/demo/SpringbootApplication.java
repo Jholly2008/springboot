@@ -11,7 +11,7 @@ public class SpringbootApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(SpringbootApplication.class, args);
-		log.info("是否为异步日志：{}", AsyncLoggerContextSelector.isSelected());
+		log.info("是否为异步日志1234567890：{}", AsyncLoggerContextSelector.isSelected());
 	}
 
 }

@@ -9,7 +9,7 @@
     <Properties>
         <!-- 格式化输出：%date表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度 %msg：日志消息，%n是换行符-->
         <!-- %logger{36} 表示 Logger 名字最长36个字符 -->
-        <property name="LOG_PATTERN" value="%date{HH:mm:ss.SSS} [TxId : %X{PtxId} , SpanId : %X{PspanId}] [%thread] %-5level %logger{36} - %msg %n" />
+        <property name="LOG_PATTERN" value="%date{HH:mm:ss.SSS} [TxId : %X{PtxId} , SpanId : %X{PspanId}] [%thread] %-5level [%maxLen{%logger}{36}] - [%maxLen{%m}{100}] %n" />
         <!-- 定义日志存储的路径 --><!-- 取spring的变量的写法如下 -->
         <property name="FILE_PATH">${spring:logging.file.path}</property>
         <property name="FILE_NAME">${spring:logging.file.name}</property>
