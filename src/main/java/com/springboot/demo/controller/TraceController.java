@@ -27,7 +27,10 @@ import java.util.UUID;
 public class TraceController {
     @Value("${service-b.url}")
     private String serviceBUrl;
-
+    @Value("${app.version}")
+    private String version;
+    @Value("${app.kubernetes.enabled:false}")
+    private boolean isKubernetesEnabled;
     private final OkHttpClient okHttpClient;
 
     private static final String X_B3_TRACE_ID = "X-B3-TraceId";
@@ -39,8 +42,18 @@ public class TraceController {
         this.okHttpClient = okHttpClient;
     }
 
-    private String generateSpanId() {
-        return "service-a-" + UUID.randomUUID().toString().replace("-", "").substring(0, 16);
+    private String generateSpanId(HttpServletRequest request) {
+        // 先尝试从请求头获取 Istio 生成的 spanId
+        String istioSpanId = request.getHeader(X_B3_SPAN_ID);
+        if (istioSpanId != null && !istioSpanId.isEmpty()) {
+            log.debug("Using Istio generated spanId: {}", istioSpanId);
+            return istioSpanId;
+        }
+
+        // 如果没有 Istio spanId，才生成新的
+        String newSpanId = "service-a-" + UUID.randomUUID().toString().replace("-", "").substring(0, 16);
+        log.debug("Generated new spanId: {}", newSpanId);
+        return newSpanId;
     }
 
     @GetMapping("/trace")
@@ -59,19 +72,28 @@ public class TraceController {
         }
 
         // 为Service A生成新的spanId
-        String serviceASpanId = generateSpanId();
+        String serviceASpanId = generateSpanId(httpServletRequest);
 
         long startTime = System.currentTimeMillis();
 
-        // 调用Service B的请求
-        Request request = new Request.Builder()
+        // 构建请求
+        Request.Builder requestBuilder = new Request.Builder()
                 .url(serviceBUrl + "/api/cost")
-                .get()
-                .addHeader(X_B3_TRACE_ID, traceId)
-                .addHeader(X_B3_PARENT_SPAN_ID, serviceASpanId)  // Service A的spanId作为Service B的parentSpanId
-                .addHeader(X_B3_SPAN_ID, generateSpanId())  // 为Service B生成新的spanId
-                .addHeader(X_B3_SAMPLED, sampled)
-                .build();
+                .get();
+
+        // 只在非 k8s 环境下手动传递追踪信息
+        if (!isKubernetesEnabled) {
+            log.debug("Not in Kubernetes environment, manually propagating trace headers");
+            requestBuilder
+                    .addHeader(X_B3_TRACE_ID, traceId)
+                    .addHeader(X_B3_PARENT_SPAN_ID, serviceASpanId)
+                    .addHeader(X_B3_SPAN_ID, serviceASpanId)
+                    .addHeader(X_B3_SAMPLED, sampled);
+        } else {
+            log.debug("Running in Kubernetes environment, trace propagation handled by Istio");
+        }
+
+        Request request = requestBuilder.build();
 
         List<TraceInfo> traceInfoList = new ArrayList<>();
 
@@ -107,7 +129,7 @@ public class TraceController {
                     serviceASpanId,
                     gatewaySpanId, // 网关的spanId作为Service A的parentSpanId
                     "serviceA",
-                    "1.0.0",
+                    version,
                     startTime,
                     endTime,
                     endTime - startTime,
