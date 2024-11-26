@@ -58,11 +58,11 @@ public class TraceController {
     private String getParentSpanId(HttpServletRequest request) {
         if (isKubernetesEnabled) {
             String parentSpanId = request.getHeader(X_B3_PARENT_SPAN_ID);
-            log.debug("Using Istio generated parentSpanId: {}", parentSpanId);
+            log.info("Using Istio generated parentSpanId: {}", parentSpanId);
             return parentSpanId;
         } else {
             String parentSpanId = request.getHeader(X_B3_SPAN_ID);
-            log.debug("Using Gateway generated parentSpanId: {}", parentSpanId);
+            log.info("Using Gateway generated parentSpanId: {}", parentSpanId);
             return parentSpanId;
         }
     }
@@ -105,7 +105,7 @@ public class TraceController {
                     .addHeader(X_B3_SPAN_ID, serviceASpanId)
                     .addHeader(X_B3_SAMPLED, sampled);
         } else {
-            log.debug("Running in Kubernetes environment, trace propagation handled by Istio");
+            log.info("Running in Kubernetes environment, trace propagation handled by Istio");
         }
 
         Request request = requestBuilder.build();
