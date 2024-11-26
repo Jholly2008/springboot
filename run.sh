@@ -36,7 +36,7 @@ echo "Service B URI: $SERVICE_B_URI"
 
 docker run -d \
    -p $PORT:$PORT \
-   -e JVM_MEM=512M \
+   -e JVM_MEM=1G \
    -e APP_VERSION=$VERSION \
    -e SERVICE_B_URI=$SERVICE_B_URI \
    --name $CONTAINER_NAME \
