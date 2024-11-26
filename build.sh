@@ -4,7 +4,7 @@
 DOCKER_DIR="./docker"
 JAR_NAME="springboot-0.0.1-SNAPSHOT.jar"
 DOCKER_JAR_NAME="app.jar"
-DOCKER_IMAGE_NAME="kkk2099/kkk:springboot-demo-1.0"
+DOCKER_IMAGE_NAME="kkk2099/kkk:service-a-1.0"
 
 # 使用Maven打包，并跳过测试
 mvn clean package -Dmaven.test.skip=true
