@@ -11,6 +11,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -66,8 +67,19 @@ public class TraceController {
         }
     }
 
+    private void logTraceInfo(HttpServletRequest request) {
+        String traceId = request.getHeader(X_B3_TRACE_ID);
+        String spanId = request.getHeader(X_B3_SPAN_ID);
+        String parentSpanId = request.getHeader(X_B3_PARENT_SPAN_ID);
+
+        log.info("Gateway Trace - ParentSpanId: {}, TraceId: {}, SpanId: {}", parentSpanId, traceId, spanId);
+    }
+
     @GetMapping("/trace")
     public PageResult<Object> testSimulateIOOperation(HttpServletRequest httpServletRequest) {
+        logTraceInfo(httpServletRequest);
+
+
         // 从网关获取追踪信息
         String traceId = httpServletRequest.getHeader(X_B3_TRACE_ID);
         String sampled = httpServletRequest.getHeader(X_B3_SAMPLED);
@@ -83,6 +95,7 @@ public class TraceController {
                 .url(serviceBUrl + "/api/cost")
                 .get();
 
+        log.info("parentSpanId:" + parentSpanId + " traceId:" + traceId + "   sampled:" + sampled + "   serviceASpanId:" + serviceASpanId);
         // 只在非 k8s 环境下手动传递追踪信息
         if (!isKubernetesEnabled) {
             log.debug("Not in Kubernetes environment, manually propagating trace headers");
@@ -171,8 +184,6 @@ public class TraceController {
                 .body(traceInfoList)
                 .pagination(1, 10, traceInfoList.size());
     }
-
-
 
 
 }
