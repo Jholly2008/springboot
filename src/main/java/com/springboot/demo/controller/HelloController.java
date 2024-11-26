@@ -1,13 +1,16 @@
 package com.springboot.demo.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("springboot-demo/hello")
+@RequestMapping("/service-a")
 @Slf4j
+@Tag(name = "测试", description = "测试")
 public class HelloController {
 
     @Value("${app.version}")

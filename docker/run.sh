@@ -5,6 +5,9 @@ echo JVM_MEM:$JVM_MEM
 
 if test -z "$PINPOINT_APPNAME"; then
     case "$JVM_MEM" in
+        "512M")
+            java -Xms400m -Xmx400m -Xmn128m -Xss512k -XX:SurvivorRatio=8 -XX:MaxDirectMemorySize=64m -XX:MetaspaceSize=50M -XX:MaxMetaspaceSize=50m -XX:+UnlockExperimentalVMOptions -XX:ConcGCThreads=1 -XX:ParallelGCThreads=1 -XX:+UseG1GC -XX:MaxGCPauseMillis=50 -XX:ReservedCodeCacheSize=32m -XX:+UseCompressedClassPointers -XX:CompressedClassSpaceSize=24M -XX:-UseCounterDecay -XX:+AlwaysPreTouch -XX:+DisableExplicitGC -XX:+UnlockDiagnosticVMOptions -XX:GuaranteedSafepointInterval=0 -XX:+UseCountedLoopSafepoints -XX:LoopStripMiningIter=1000 -XX:+PrintCommandLineFlags -XX:+ExplicitGCInvokesConcurrent -XX:AutoBoxCacheMax=20000 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/usr/local/apps/jvm/ -XX:ErrorFile=/usr/local/apps/jvm/hs_err_%p.log -jar app.jar
+            ;;
         "1G")
             java -Xms800m -Xmx800m -Xmn256m -Xss512k -XX:SurvivorRatio=8 -XX:MaxDirectMemorySize=128m -XX:MetaspaceSize=100M -XX:MaxMetaspaceSize=100m -XX:+UnlockExperimentalVMOptions -XX:ConcGCThreads=1 -XX:ParallelGCThreads=1 -XX:+UseG1GC -XX:MaxGCPauseMillis=50 -XX:ReservedCodeCacheSize=64m -XX:+UseCompressedClassPointers -XX:CompressedClassSpaceSize=48M -XX:-UseCounterDecay -XX:+AlwaysPreTouch -XX:+DisableExplicitGC -XX:+UnlockDiagnosticVMOptions -XX:GuaranteedSafepointInterval=0 -XX:+UseCountedLoopSafepoints -XX:LoopStripMiningIter=1000 -XX:+PrintCommandLineFlags -XX:+ExplicitGCInvokesConcurrent -XX:AutoBoxCacheMax=20000 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/usr/local/apps/jvm/ -XX:ErrorFile=/usr/local/apps/jvm/hs_err_%p.log -jar app.jar
             ;;

@@ -7,12 +7,12 @@ spec:
   selector:
     matchLabels:
       app: springboot-demo
-      version: v1.0.0
+      version: v1
   template:
     metadata:
       labels:
         app: springboot-demo
-        version: v1.0.0
+        version: v1
     spec:
       containers:
         - name: springboot-demo
@@ -20,9 +20,9 @@ spec:
           imagePullPolicy: Always
           env:
             - name: JVM_MEM
-              value: "1G"
+              value: "512M"
             - name: APP_VERSION
-              value: "1.0.0"
+              value: "v1"
           ports:
             - containerPort: 10001
           livenessProbe:
@@ -52,12 +52,12 @@ spec:
   selector:
     matchLabels:
       app: springboot-demo
-      version: v2.0.0
+      version: v2
   template:
     metadata:
       labels:
         app: springboot-demo
-        version: v2.0.0
+        version: v2
     spec:
       containers:
         - name: springboot-demo
@@ -65,9 +65,54 @@ spec:
           imagePullPolicy: Always
           env:
             - name: JVM_MEM
-              value: "1G"
+              value: "512M"
             - name: APP_VERSION
-              value: "2.0.0"
+              value: "v2"
+          ports:
+            - containerPort: 10001
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 10001
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 10001
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: springboot-demo-v3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: springboot-demo
+      version: v3
+  template:
+    metadata:
+      labels:
+        app: springboot-demo
+        version: v3
+    spec:
+      containers:
+        - name: springboot-demo
+          image: kkk2099/kkk:springboot-demo-1.0
+          imagePullPolicy: Always
+          env:
+            - name: JVM_MEM
+              value: "512M"
+            - name: APP_VERSION
+              value: "v3"
           ports:
             - containerPort: 10001
           livenessProbe:
@@ -100,32 +145,4 @@ spec:
       port: 10001  # 你希望暴露的端口
       targetPort: 10001  # 容器内部端口
   type: ClusterIP
-
-
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: springboot-demo-ingress
-  namespace: default
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
-spec:
-  ingressClassName: nginx  # 添加这一行
-  rules:
-    - host: app1.konglingan.com
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: springboot-demo
-                port:
-                  number: 10001
-
-
-
-
-
 
