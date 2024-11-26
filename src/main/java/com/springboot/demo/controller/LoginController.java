@@ -19,7 +19,7 @@ import java.util.List;
 
 @Tag(name = "登录", description = "登录")
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/service-a")
 @Slf4j
 public class LoginController {
 
