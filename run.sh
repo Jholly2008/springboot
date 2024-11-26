@@ -1,20 +1,20 @@
 #!/bin/bash
 
+# 默认值
+DEFAULT_VERSION="1.0"
+DEFAULT_SERVICE_B_URI="http://170.106.189.13:10002"
+
 # 显示使用方法
 usage() {
-   echo "Usage: $0 <version> <service_b_uri>"
+   echo "Usage: $0 [version] [service_b_uri]"
+   echo "Default version: $DEFAULT_VERSION"
+   echo "Default URI: $DEFAULT_SERVICE_B_URI"
    echo "Example: $0 1.0 http://170.106.189.13:10002"
-   exit 1
 }
 
-# 检查参数个数
-if [ $# -ne 2 ]; then
-   usage
-fi
-
-# 获取参数
-VERSION=$1
-SERVICE_B_URI=$2
+# 获取参数，使用默认值
+VERSION=${1:-$DEFAULT_VERSION}
+SERVICE_B_URI=${2:-$DEFAULT_SERVICE_B_URI}
 
 # 容器配置
 CONTAINER_NAME="service-a"
