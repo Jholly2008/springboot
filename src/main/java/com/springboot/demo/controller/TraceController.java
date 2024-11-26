@@ -43,35 +43,37 @@ public class TraceController {
     }
 
     private String generateSpanId(HttpServletRequest request) {
-        // 先尝试从请求头获取 Istio 生成的 spanId
-        String istioSpanId = request.getHeader(X_B3_SPAN_ID);
-        if (istioSpanId != null && !istioSpanId.isEmpty()) {
+        if (isKubernetesEnabled) {
+            String istioSpanId = request.getHeader(X_B3_SPAN_ID);
             log.debug("Using Istio generated spanId: {}", istioSpanId);
             return istioSpanId;
+        } else {
+            String newSpanId = "service-a-" + UUID.randomUUID().toString().replace("-", "").substring(0, 16);
+            log.debug("Generated new spanId: {}", newSpanId);
+            return newSpanId;
         }
+    }
 
-        // 如果没有 Istio spanId，才生成新的
-        String newSpanId = "service-a-" + UUID.randomUUID().toString().replace("-", "").substring(0, 16);
-        log.debug("Generated new spanId: {}", newSpanId);
-        return newSpanId;
+    private String getParentSpanId(HttpServletRequest request) {
+        if (isKubernetesEnabled) {
+            String parentSpanId = request.getHeader(X_B3_PARENT_SPAN_ID);
+            log.debug("Using Istio generated parentSpanId: {}", parentSpanId);
+            return parentSpanId;
+        } else {
+            String parentSpanId = request.getHeader(X_B3_SPAN_ID);
+            log.debug("Using Gateway generated parentSpanId: {}", parentSpanId);
+            return parentSpanId;
+        }
     }
 
     @GetMapping("/trace")
     public PageResult<Object> testSimulateIOOperation(HttpServletRequest httpServletRequest) {
         // 从网关获取追踪信息
         String traceId = httpServletRequest.getHeader(X_B3_TRACE_ID);
-        String gatewaySpanId = httpServletRequest.getHeader(X_B3_SPAN_ID); // 网关的spanId作为我们的parentSpanId
-        String gatewayParentSpanId = httpServletRequest.getHeader(X_B3_PARENT_SPAN_ID); // 网关的spanId作为我们的parentSpanId
         String sampled = httpServletRequest.getHeader(X_B3_SAMPLED);
 
-        if (traceId == null) {
-            log.warn("No trace ID found in request, generating new one");
-            traceId = UUID.randomUUID().toString().replace("-", "");
-            gatewaySpanId = "0"; // 如果没有网关spanId，设置为0
-            sampled = "1";
-        }
-
         // 为Service A生成新的spanId
+        String parentSpanId = getParentSpanId(httpServletRequest);
         String serviceASpanId = generateSpanId(httpServletRequest);
 
         long startTime = System.currentTimeMillis();
@@ -86,7 +88,7 @@ public class TraceController {
             log.debug("Not in Kubernetes environment, manually propagating trace headers");
             requestBuilder
                     .addHeader(X_B3_TRACE_ID, traceId)
-                    .addHeader(X_B3_PARENT_SPAN_ID, serviceASpanId)
+                    .addHeader(X_B3_PARENT_SPAN_ID, parentSpanId)
                     .addHeader(X_B3_SPAN_ID, serviceASpanId)
                     .addHeader(X_B3_SAMPLED, sampled);
         } else {
@@ -112,8 +114,8 @@ public class TraceController {
             // 构建网关的TraceInfo
             TraceInfo gatewayTrace = new TraceInfo(
                     traceId,
-                    gatewaySpanId,
-                    gatewayParentSpanId,
+                    parentSpanId, // 对service而言，网关的spanId就是我service的parentSpanId
+                    "0",
                     "gateway",
                     "1.0.0",
                     startTime - 100, // 假设网关比Service A早100ms
@@ -127,7 +129,7 @@ public class TraceController {
             TraceInfo serviceATrace = new TraceInfo(
                     traceId,
                     serviceASpanId,
-                    gatewaySpanId, // 网关的spanId作为Service A的parentSpanId
+                    parentSpanId, // 网关的spanId作为Service A的parentSpanId
                     "serviceA",
                     version,
                     startTime,
@@ -169,4 +171,8 @@ public class TraceController {
                 .body(traceInfoList)
                 .pagination(1, 10, traceInfoList.size());
     }
+
+
+
+
 }
