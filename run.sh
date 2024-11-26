@@ -19,7 +19,7 @@ SERVICE_B_URI=${2:-$DEFAULT_SERVICE_B_URI}
 # 容器配置
 CONTAINER_NAME="service-a"
 IMAGE_NAME="kkk2099/kkk"
-SERVICE_NAME="service-a"
+TAG_NAME="service-a-1.0"
 PORT="10001"
 
 # 检查并移除已存在的容器
@@ -30,7 +30,7 @@ if [ "$(docker ps -aq -f name=$CONTAINER_NAME)" ]; then
 fi
 
 # 运行新容器
-echo "Starting $SERVICE_NAME..."
+echo "Starting $IMAGE_NAME:$TAG_NAME..."
 echo "Version: $VERSION"
 echo "Service B URI: $SERVICE_B_URI"
 
@@ -40,6 +40,6 @@ docker run -d \
    -e APP_VERSION=$VERSION \
    -e SERVICE_B_URI=$SERVICE_B_URI \
    --name $CONTAINER_NAME \
-   $IMAGE_NAME:$SERVICE_NAME-$VERSION
+   $IMAGE_NAME:$TAG_NAME
 
 echo "Container started. Use 'docker logs $CONTAINER_NAME' to view logs."
