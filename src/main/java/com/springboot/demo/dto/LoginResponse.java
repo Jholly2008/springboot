@@ -18,4 +18,6 @@ public class LoginResponse {
     private String type;
     @Schema(description = "token", example = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
     private String currentAuthority;
+    @Schema(description = "版本", example = "v2")
+    private String frontendVersion;
 }

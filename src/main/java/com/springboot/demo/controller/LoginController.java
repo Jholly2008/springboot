@@ -40,11 +40,17 @@ public class LoginController {
         // 2. 生成JWT token
         String token = jwtUtils.generateToken(loginRequest.getUsername());
 
+        String version = null;
+        if (loginRequest.getUsername().contains("v1")) {
+            version = "v1";
+        }
+
         // 3. 返回登录结果
         return new LoginResponse(
                 "ok",                     // status
                 "account",               // type
-                token                // currentAuthority - 暂时硬编码为admin,实际应该根据用户角色设置
+                token,               // currentAuthority - 暂时硬编码为admin,实际应该根据用户角色设置
+                version
         );
     }
 
@@ -71,6 +77,12 @@ public class LoginController {
     @GetMapping("/currentUser")
     public ApiResult<Object> currentUser(@RequestParam(required = false) String token) {
         System.out.println("currentUser : void " + token);
+        String tenant = "孔祥俊";
+        if (jwtUtils.validateToken(token)) {
+            tenant = jwtUtils.getTenantFromToken(token);
+        } else {
+            throw new DemoBaseException(ErrorCode.UnauthorizedException_ErrorCode, HttpStatus.UNAUTHORIZED, "Invalid token");
+        }
         UserTag tag1 = new UserTag("0", "很有想法的");
         UserTag tag2 = new UserTag("1", "专注设计");
         UserTag tag3 = new UserTag("2", "辣~");
@@ -89,7 +101,7 @@ public class LoginController {
         City city = new City("南京市", "330100");
         Geographic geographic = new Geographic(province, city);
 
-        User user = new User("孔祥俊", "https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png",
+        User user = new User(tenant, "https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png",
                 "00000001", "123@digi.com", "海纳百川，有容乃大", "交互专家",
                 "鼎捷－UED", tags, 12, 11, "China", "admin", geographic,
                 "南京 777 号", "025-888888888");
