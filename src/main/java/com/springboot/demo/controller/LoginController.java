@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -75,7 +76,12 @@ public class LoginController {
     }
 
     @GetMapping("/currentUser")
-    public ApiResult<Object> currentUser(@RequestParam(required = false) String token) {
+    public ApiResult<Object> currentUser(@RequestParam(required = false) String token,
+                                         @RequestHeader(value = "Authorization", required = false) String authHeader) {
+
+        if (null == token || !StringUtils.hasLength(token)) {
+            token = authHeader;
+        }
         System.out.println("currentUser : void " + token);
         String tenant = "孔祥俊";
         if (jwtUtils.validateToken(token)) {
