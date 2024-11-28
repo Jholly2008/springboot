@@ -10,7 +10,6 @@ import com.springboot.demo.utils.JwtUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -24,9 +23,6 @@ import java.util.List;
 @Slf4j
 public class LoginController {
 
-    @Autowired
-    private JwtUtils jwtUtils;
-
     @Operation(summary = "登录", description = "登录")
     @PostMapping("/login/account")
     public LoginResponse login(@RequestBody LoginRequest loginRequest) {
@@ -39,7 +35,7 @@ public class LoginController {
         }
 
         // 2. 生成JWT token
-        String token = jwtUtils.generateToken(loginRequest.getUsername());
+        String token = JwtUtils.generateToken(loginRequest.getUsername());
 
         String version = "";
         if (loginRequest.getUsername().contains("v1")) {
@@ -64,8 +60,8 @@ public class LoginController {
     @GetMapping("/parse-tenant")
     public ApiResult<Object> parseTenant(String token) {
         if (token != null && token.startsWith("Bearer ")) {
-            if (jwtUtils.validateToken(token)) {
-                String tenant = jwtUtils.getTenantFromToken(token);
+            if (JwtUtils.validateToken(token)) {
+                String tenant = JwtUtils.getTenantFromToken(token);
                 // 使用tenant进行后续处理
                 return ApiResult.ok().body("Tenant: " + tenant);
             }
@@ -84,8 +80,8 @@ public class LoginController {
         }
         System.out.println("currentUser : void " + token);
         String tenant = "孔祥俊";
-        if (jwtUtils.validateToken(token)) {
-            tenant = jwtUtils.getTenantFromToken(token);
+        if (JwtUtils.validateToken(token)) {
+            tenant = JwtUtils.getTenantFromToken(token);
         } else {
             throw new DemoBaseException(ErrorCode.UnauthorizedException_ErrorCode, HttpStatus.UNAUTHORIZED, "Invalid token");
         }

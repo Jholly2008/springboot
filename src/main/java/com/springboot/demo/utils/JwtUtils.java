@@ -4,25 +4,20 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
-@Component
 public class JwtUtils {
 
-    @Value("${jwt.secret}") // 从配置文件读取密钥
-    private String jwtSecret;
-
-    private SecretKey getSigningKey() {
+    private static SecretKey getSigningKey() {
+        String jwtSecret = "mySuperSecretKey123!@#$%^&*()_+-=[]{}|;:,.<>?";
         byte[] keyBytes = jwtSecret.getBytes(StandardCharsets.UTF_8);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String generateToken(String username) {
+    public static String generateToken(String username) {
         Date now = new Date();
         Date validity = new Date(now.getTime() + 36000000);
 
@@ -37,7 +32,7 @@ public class JwtUtils {
         return "Bearer " + token;
     }
 
-    public String getTenantFromToken(String token) {
+    public static String getTenantFromToken(String token) {
         try {
             String actualToken = token.replace("Bearer ", "");
             Claims claims = Jwts.parser()
@@ -51,7 +46,7 @@ public class JwtUtils {
         }
     }
 
-    public boolean validateToken(String token) {
+    public static boolean validateToken(String token) {
         try {
             String actualToken = token.replace("Bearer ", "");
 

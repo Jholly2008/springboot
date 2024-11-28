@@ -39,6 +39,9 @@ public class TraceController {
     private static final String X_B3_PARENT_SPAN_ID = "X-B3-ParentSpanId";
     private static final String X_B3_SAMPLED = "X-B3-Sampled";
 
+    private static final String VERSION_HEADER = "x-api-version";
+
+
     public TraceController(OkHttpClient okHttpClient) {
         this.okHttpClient = okHttpClient;
     }
@@ -71,8 +74,10 @@ public class TraceController {
         String traceId = request.getHeader(X_B3_TRACE_ID);
         String spanId = request.getHeader(X_B3_SPAN_ID);
         String parentSpanId = request.getHeader(X_B3_PARENT_SPAN_ID);
+        String version = request.getHeader(VERSION_HEADER);
 
-        log.info("Gateway Trace - ParentSpanId: {}, TraceId: {}, SpanId: {}", parentSpanId, traceId, spanId);
+
+        log.info("Gateway Trace - ParentSpanId: {}, TraceId: {}, SpanId: {},, Version: {}", parentSpanId, traceId, spanId, version);
     }
 
     @GetMapping("/trace")
