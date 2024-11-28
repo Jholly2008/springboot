@@ -40,7 +40,7 @@ public class LoginController {
         // 2. 生成JWT token
         String token = jwtUtils.generateToken(loginRequest.getUsername());
 
-        String version = null;
+        String version = "";
         if (loginRequest.getUsername().contains("v1")) {
             version = "v1";
         }
