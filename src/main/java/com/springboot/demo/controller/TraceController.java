@@ -13,12 +13,14 @@ import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Tag(name = "链路", description = "链路")
@@ -81,7 +83,14 @@ public class TraceController {
     }
 
     @GetMapping("/trace")
-    public PageResult<Object> testSimulateIOOperation(HttpServletRequest httpServletRequest) {
+    public PageResult<Object> testSimulateIOOperation(HttpServletRequest httpServletRequest,@RequestHeader Map<String, String> headers) {
+        // 打印所有请求头
+        System.out.println("=== Headers ===");
+        headers.forEach((key, value) -> {
+            System.out.println(key + ": " + value);
+        });
+
+
         logTraceInfo(httpServletRequest);
 
 

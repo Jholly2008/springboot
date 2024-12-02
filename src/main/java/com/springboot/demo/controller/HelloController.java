@@ -1,5 +1,6 @@
 package com.springboot.demo.controller;
 
+import io.opentelemetry.api.baggage.Baggage;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -7,11 +8,15 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/service-a")
 @Slf4j
 @Tag(name = "测试", description = "测试")
 public class HelloController {
+
+    private static final String TENANT_HEADER = "x-api-version";
 
     @Value("${app.version}")
     private String version;
@@ -27,9 +32,27 @@ public class HelloController {
     }
 
     @GetMapping("/version")
-    public String version() {
+    public String version(@RequestHeader Map<String, String> headers) {
         log.error("version..." + version);
         System.out.println("version..." + version);
+
+        // 打印所有请求头
+        System.out.println("=== Headers ===");
+        headers.forEach((key, value) -> {
+            System.out.println(key + ": " + value);
+        });
+
+        // 特别打印 baggage 相关信息
+        String tenant = Baggage.current().getEntryValue(TENANT_HEADER);
+        System.out.println("\n=== Baggage ===");
+        System.out.println("tenant: " + tenant);
+
+        // 打印当前所有 Baggage 值
+        System.out.println("\n=== All Baggage Values ===");
+        Baggage.current().forEach((key, value) -> {
+            System.out.println(key + ": " + value);
+        });
+
         return "version ..." + version;
     }
 
