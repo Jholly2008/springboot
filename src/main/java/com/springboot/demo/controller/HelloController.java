@@ -52,14 +52,59 @@ public class HelloController {
         Baggage.current().forEach((key, value) -> {
             System.out.println(key + ": " + value);
         });
-
         return "version ..." + version;
     }
 
     @GetMapping("/test-io")
-    public String testSimulateIOOperation() {
+    public String testSimulateIOOperation(@RequestHeader Map<String, String> headers) {
+        log.error("version..." + version);
+        System.out.println("version..." + version);
+
+        // 打印所有请求头
+        System.out.println("=== Headers ===");
+        headers.forEach((key, value) -> {
+            System.out.println(key + ": " + value);
+        });
+
+        // 特别打印 baggage 相关信息
+        String tenant = Baggage.current().getEntryValue(TENANT_HEADER);
+        System.out.println("\n=== Baggage ===");
+        System.out.println("tenant: " + tenant);
+
+        // 打印当前所有 Baggage 值
+        System.out.println("\n=== All Baggage Values ===");
+        Baggage.current().forEach((key, value) -> {
+            System.out.println(key + ": " + value);
+        });
+
         // 模拟I/O操作
         simulateIOOperation();
+        return "Test response with computation and I/O";
+    }
+
+    @GetMapping("/test-exception")
+    public String testException(@RequestHeader Map<String, String> headers) {
+        log.error("version..." + version);
+        System.out.println("version..." + version);
+
+        // 打印所有请求头
+        System.out.println("=== Headers ===");
+        headers.forEach((key, value) -> {
+            System.out.println(key + ": " + value);
+        });
+
+        // 特别打印 baggage 相关信息
+        String tenant = Baggage.current().getEntryValue(TENANT_HEADER);
+        System.out.println("\n=== Baggage ===");
+        System.out.println("tenant: " + tenant);
+
+        // 打印当前所有 Baggage 值
+        System.out.println("\n=== All Baggage Values ===");
+        Baggage.current().forEach((key, value) -> {
+            System.out.println(key + ": " + value);
+        });
+
+        int a = 1 / 0;
         return "Test response with computation and I/O";
     }
 
@@ -90,7 +135,7 @@ public class HelloController {
     private void simulateIOOperation() {
         try {
             // 模拟I/O延迟
-            Thread.sleep(100); // 模拟100ms的I/O延迟
+            Thread.sleep(10000); // 模拟100ms的I/O延迟
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
