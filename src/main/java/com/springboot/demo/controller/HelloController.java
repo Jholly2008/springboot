@@ -108,7 +108,7 @@ public class HelloController {
         return "Test response with computation and I/O";
     }
 
-    @GetMapping("/test-air")
+    @RequestMapping(value = "/test-air", method = {RequestMethod.GET, RequestMethod.POST})
     public String testEndpoint() {
         // 迅捷的响应
         return "Test response with air";
