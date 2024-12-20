@@ -37,9 +37,9 @@ public class LoginController {
         // 2. 生成JWT token
         String token = JwtUtils.generateToken(loginRequest.getUsername());
 
-        String version = "";
-        if (loginRequest.getUsername().contains("v1")) {
-            version = "v1";
+        String version = "v1";
+        if (loginRequest.getUsername().contains("v2")) {
+            version = "v2";
         }
 
         // 3. 返回登录结果
